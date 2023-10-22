@@ -5,49 +5,37 @@ import streamlit as st
 import datetime as dt
 from xbbg import blp
 import yfinance as yf
+from pandas.tseries.offsets import MonthEnd
 
-#%% Cast into a class
-class indexdata:
-    def __init__(self, ticker, close, volume):
-        self.ticker = ticker
-        self.close = close
-        self.volume = volume
-# method - technical indicator
-msft = yf.Ticker("MSFT")
 #%% Get Country Data
 startdate = '2010-10-10'
 enddate = (dt.date.today() - dt.timedelta(days=7)).strftime("%Y/%m/%d")
-index_list = ['MXUS Index', 'MXJP Index', 'MXEU Index', 'MXCN Index']
+tickers = ['SPX Index']
 
 # US, Japan, Europe, China
-country_index_data = blp.bdh(tickers=index_list, 
-                             flds=['TOT_RETURN_INDEX_GROSS_DVDS'],
-                             start_date= startdate, 
-                             end_date=enddate)
-
-
-# Clean up a df
+data = blp.bdh(tickers=tickers, 
+                start_date= startdate, 
+                end_date=enddate).fillna(method='ffill')
 
 
 #%% Get Technical Indicator Data
 
 # Simple Moving Average 
 def SMA(data, ndays): 
-    SMA = pd.Series(data['Close'].rolling(ndays).mean(), name = 'SMA') 
-    data = data.join(SMA) 
+    data[(data.columns[0][0], "SMA_" + str(ndays))] = data.rolling(ndays).mean()
     return data
+
+
 
 # Exponentially-weighted Moving Average 
 def EWMA(data, ndays): 
-    EMA = pd.Series(data['Close'].ewm(span = ndays, min_periods = ndays - 1).mean(), 
-                 name = 'EWMA_' + str(ndays)) 
-    data = data.join(EMA) 
+    data[(data.columns[0][0], "EWMA_" + str(ndays))] = data.ewm(span = ndays, min_periods = ndays - 1).mean()  
     return data
 
 # Relative Strength Index
-def rsi(close, periods = 14):
-    
-    close_delta = close.diff()
+def rsi(data, periods = 14):
+    data[(data.columns[0][0], "RSI_" + str(periods))] = data.diff()
+    close_delta = data[(data.columns[0][0], "RSI_" + str(periods))]
 
     # Make two series: one for lower closes and one for higher closes
     up = close_delta.clip(lower=0)
@@ -61,15 +49,10 @@ def rsi(close, periods = 14):
     return rsi
 
 
-# Bollinger Band
-def BBANDS(data, window = n):
-    MA = data.Close.rolling(window=n).mean()
-    SD = data.Close.rolling(window=n).std()
-    data['MiddleBand'] = MA
-    data['UpperBand'] = MA + (2 * SD) 
-    data['LowerBand'] = MA - (2 * SD)
-    return data
- 
+#%% Get Technical Indicator
+sma = SMA(data, 5)
+ema = EWMA(data, 5)
+rsi = rsi(data)
 
 #%% Return Model 
 

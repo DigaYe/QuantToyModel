@@ -38,7 +38,8 @@ class Asset:
         return std
     
     
-    
+    def rsi(self, period = 14):
+        close_delta = self.
     
 #%% Test Asset
 spy = Asset('SPX Index', '2020-10-01')
