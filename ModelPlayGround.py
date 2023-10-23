@@ -26,7 +26,6 @@ def SMA(data, ndays):
     return data
 
 
-
 # Exponentially-weighted Moving Average 
 def EWMA(data, ndays): 
     data[(data.columns[0][0], "EWMA_" + str(ndays))] = data.ewm(span = ndays, min_periods = ndays - 1).mean()  
@@ -55,6 +54,8 @@ ema = EWMA(data, 5)
 rsi = rsi(data)
 
 #%% Return Model 
+
+#%% Trade Signal 
 
 
 
