@@ -22,8 +22,8 @@ data = blp.bdh(tickers=tickers,
 
 # Simple Moving Average 
 def SMA(data, ndays): 
-    data[(data.columns[0][0], "SMA_" + str(ndays))] = data.rolling(ndays).mean()
-    return data
+    df[(df.columns[0][0], "SMA_" + str(ndays))] = df.rolling(ndays).mean()
+    return df
 
 
 # Exponentially-weighted Moving Average 
@@ -32,7 +32,7 @@ def EWMA(data, ndays):
     return data
 
 # Relative Strength Index
-def rsi(data, periods = 14):
+def RSI(data, periods = 14):
     data[(data.columns[0][0], "RSI_" + str(periods))] = data.diff()
     close_delta = data[(data.columns[0][0], "RSI_" + str(periods))]
 
@@ -51,7 +51,7 @@ def rsi(data, periods = 14):
 #%% Get Technical Indicator
 sma = SMA(data, 5)
 ema = EWMA(data, 5)
-rsi = rsi(data)
+rsi = RSI(data)
 
 #%% Return Model 
 

@@ -76,7 +76,7 @@ class MomentumRSI(BackTestSA):
         df = self.dmgt.df
         #creat change column
         df['change'] = df.close.diff()
-        df['U'] = [x if x > 0 else 0 for x in df.change]
+        df['change_up'] = [x if x > 0 else 0 for x in df.change]
         df['D'] = [abs(x) if x < 0 else 0 for x in df.change]
         df['U'] = df.U.ewm(span=self.rsi_window,
                            min_periods=self.rsi_window-1).mean()
