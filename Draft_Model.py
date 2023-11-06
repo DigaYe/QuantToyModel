@@ -16,6 +16,9 @@ import pandas_ta
 import matplotlib.pyplot  as plt
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+import backtesting
+from backtesting import Backtest, Strategy
+from backtesting.lib import crossover
 #%% Data Class
 class AssetData:
     def __init__(self, ticker, start_date, 
@@ -66,7 +69,7 @@ class RSI:
         df = self.cal_rsi().copy()
         df["Buy_" + str(self.xb)] = [1 if x < self.xb else 0 for x in df["RSI"]]
         df["Sell_" + str(self.xa)] = [-1 if x > self.xa else 0 for x in df["RSI"]]
-        df["Position"] =df["Buy" + str(self.xb)] + df["Sell_" + str(self.xa)]
+        df["Position"] =df["Buy_" + str(self.xb)] + df["Sell_" + str(self.xa)]
         return df
 
     def plot_signals(self, datapoints = 300):
@@ -89,7 +92,8 @@ class RSI:
         df = self.cal_signals()
         df["Return"] = df["Last Price"].pct_change()
         df['Strategy_returns'] = df['Return'] * df['Position'].shift(1)
-        df['Cumulative_return'] = (df['Strategy_returns'] + 1).cumprod()
+        df['Cumulative_return'] = df['Strategy_returns'] + 1
+        
         if fig:
             df['Cumulative_return'].plot(figsize=(10, 7))
             plt.title('Cumulative Strategy Returns')
@@ -99,7 +103,7 @@ class RSI:
     
 #%% Run
 ticker = "SPX Index"
-data = AssetData(ticker, "2023-10-21").get_bbg_data()
+data = AssetData(ticker, "2020-10-21").get_bbg_data()
 
 #%%
 spx = RSI(data)
