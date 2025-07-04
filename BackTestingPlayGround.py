@@ -115,11 +115,20 @@ stats = bt.optimize(
 all_trade_data = stats['_trades']
 
 
+#%% Try Backtrader library
+import backtrader as bt
+cerebro = bt.Cerebro()
+feed = bt.feeds.PandasData(dataname = data)
+cerebro.adddata(data = feed)
+cerebro.run()
+
+#%% strategy summary 
 
 
+#%% strategy correlation with long only SPX index 
 
 
-
+#%% think about to build a backtester rather
 
 
 
